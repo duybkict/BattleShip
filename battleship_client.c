@@ -2,7 +2,7 @@
 
 void onload();
 int login_menu();
-int send_request_login(int , char *);
+int request_login(int , char *);
 
 int sockfd;
 
@@ -42,13 +42,15 @@ void onload() {
 		case 1:
 			printf("Enter your name: ");
 			gets(username);
-			send_request_login(sockfd, username);
+			request_login(sockfd, username);
 			
 			break;
 		case 2:
 			exit(0);
 			break;
 	}
+	
+	while(1);
 	
 }
 

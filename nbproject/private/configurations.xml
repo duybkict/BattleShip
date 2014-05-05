@@ -30,8 +30,10 @@
           <runcommandpicklistitem>./tcpserv01 --tab -e "./tcpclient01" --tab -e</runcommandpicklistitem>
           <runcommandpicklistitem>gnome-terminal --tab -e "./tcpserv01 " --tab -e "./tcpclient01"</runcommandpicklistitem>
           <runcommandpicklistitem>gnome-terminal --tab -e "./tcpserv01 " --tab -e "./tcpcli01"</runcommandpicklistitem>
+          <runcommandpicklistitem>gnome-terminal --tab -e "./tcpserv01 " --tab -e "./tcpcli01 127.0.0.1"</runcommandpicklistitem>
+          <runcommandpicklistitem>gnome-terminal --tab -e "./tcpserv01 " --tab -e "./tcpcli01 "</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>gnome-terminal --tab -e "./tcpserv01 " --tab -e "./tcpcli01"</runcommand>
+        <runcommand>gnome-terminal --tab -e "./tcpserv01 " --tab -e "./tcpcli01 "</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <console-type>1</console-type>

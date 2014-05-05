@@ -35,6 +35,9 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/battleship_client.o \
+	${OBJECTDIR}/battleship_server.o \
+	${OBJECTDIR}/requester.o \
 	${OBJECTDIR}/tcpcli01.o \
 	${OBJECTDIR}/tcpserv01.o
 
@@ -62,6 +65,21 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battleship: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battleship ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/battleship_client.o: battleship_client.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/battleship_client.o battleship_client.c
+
+${OBJECTDIR}/battleship_server.o: battleship_server.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/battleship_server.o battleship_server.c
+
+${OBJECTDIR}/requester.o: requester.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/requester.o requester.c
 
 ${OBJECTDIR}/tcpcli01.o: tcpcli01.c 
 	${MKDIR} -p ${OBJECTDIR}

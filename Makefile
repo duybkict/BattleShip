@@ -1,14 +1,18 @@
 include Make.defines
 
-PROGS =	tcpcli01 tcpserv01
+PROGS =	requester battleship_server battleship_client
+CUSTOMLIBS = requester.o
 
 all:	${PROGS}
-
-tcpcli01:	tcpcli01.o
-		${CC} ${CFLAGS} -o $@ tcpcli01.o ${LIBS}
-
-tcpserv01:	tcpserv01.o
-		${CC} ${CFLAGS} -o $@ tcpserv01.o ${LIBS}
+	
+requester:	requester.o
+		${CC} ${CFLAGS} -c requester.c ${LIBS}
+	
+battleship_server:	battleship_server.o
+		${CC} ${CFLAGS} -o $@ battleship_server.o ${LIBS}
+	
+battleship_client:	battleship_client.o
+		${CC} ${CFLAGS} -o $@ battleship_client.o ${CUSTOMLIBS} ${LIBS}
 
 clean:
 		rm -f ${PROGS} ${CLEANFILES}

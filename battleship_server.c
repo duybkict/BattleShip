@@ -1,7 +1,18 @@
-#include	"unp.h"
+#include "unp.h"
+#include "constant.h"
 
-int
-main(int argc, char **argv) {
+void process_message(int sockfd, char *buf, int length);
+void process_login(int sockfd, char *username);
+void process_logout(int sockfd);
+
+typedef struct {
+	int sockfd;
+	char* username;
+} Client;
+
+Client logged_in_users[MAX_PLAYER_POOL];
+
+int main(int argc, char **argv) {
 	int i, maxi, maxfd, listenfd, connfd, sockfd;
 	int nready, client[FD_SETSIZE];
 	ssize_t n;
@@ -68,13 +79,9 @@ main(int argc, char **argv) {
 			if (FD_ISSET(sockfd, &rset)) {
 				if ((n = Read(sockfd, buf, MAXLINE)) == 0) {
 					/*4connection closed by client */
-					printf("Disconnect client %d\n", sockfd);
-					Close(sockfd);
-					FD_CLR(sockfd, &allset);
-					client[i] = -1;
+					process_logout(sockfd);
 				} else {
-					printf("Data from client %d\n", sockfd);
-					Writen(sockfd, buf, n);
+					process_message(sockfd, buf, n);
 				}
 
 				if (--nready <= 0)
@@ -83,4 +90,67 @@ main(int argc, char **argv) {
 		}
 	}
 }
-/* end fig02 */
+
+void process_message(int sockfd, char *buf, int length) {
+	if (DEBUG) printf("Start processing message...\n");
+	
+	char tokens[MAX_TOKEN_NUM][MAXLINE];
+	char *str1, *token, *saveptr1;
+	int i;
+
+	for (i = 0, str1 = buf; ; i++, str1 = NULL) {
+		token = strtok_r(str1, "|", &saveptr1);
+		if (token == NULL)
+			break;
+		strcpy(tokens[i], token);
+	}
+	
+	switch (atoi(tokens[0])) {
+		case MSG_LOGIN:
+			process_login(sockfd, tokens[1]);
+			break;
+	}
+
+	if (DEBUG) printf("End processing message...\n");
+}
+
+void process_login(int sockfd, char* username) {
+	if (DEBUG) printf("Start login...\n");
+
+	char response[MAXLINE];
+	int i;
+
+	for (i = 0; i < MAX_PLAYER_POOL; i++) {
+//		if (logged_in_users[i] == NULL)
+//			break;
+		
+		if (strcmp(logged_in_users[i].username, username) == 0) {
+			
+			// Another player logged in with the same name
+			sprintf(response, "%d%c%d%c%s", MSG_LOGIN, DELIMITER, ERROR, DELIMITER, "Another player logged in with the same name");
+			Writen(sockfd, response, strlen(response));
+			return;
+		}
+	}
+
+	if (sockfd >= MAX_PLAYER_POOL) {
+		
+		// Reach maximum players pool
+		sprintf(response, "%d%c%d%c%s", MSG_LOGIN, DELIMITER, ERROR, DELIMITER, "Reach maximum players pool");
+		Writen(sockfd, response, strlen(response));
+		return;
+	}
+
+	// Login successfully
+	logged_in_users[sockfd].sockfd = sockfd;
+	logged_in_users[sockfd].username = strdup(username);
+
+	sprintf(response, "%d%c%d%c%s", MSG_LOGIN, DELIMITER, SUCCESS, DELIMITER, "Login successfully");
+	Writen(sockfd, response, strlen(response));
+	
+	if (DEBUG) printf("End login...\n");
+}
+
+void process_logout(int sockfd) {
+	
+}

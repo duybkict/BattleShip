@@ -4,6 +4,8 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>constant.h</itemPath>
+      <itemPath>requester.h</itemPath>
       <itemPath>unpv13e</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -13,6 +15,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>battleship_client.c</itemPath>
+      <itemPath>battleship_server.c</itemPath>
+      <itemPath>requester.c</itemPath>
       <itemPath>tcpcli01.c</itemPath>
       <itemPath>tcpserv01.c</itemPath>
     </logicalFolder>
@@ -39,6 +44,16 @@
       </toolsSet>
       <compileType>
       </compileType>
+      <item path="battleship_client.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="battleship_server.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="constant.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="requester.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="requester.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="tcpcli01.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="tcpserv01.c" ex="false" tool="0" flavor2="0">
@@ -66,6 +81,16 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="battleship_client.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="battleship_server.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="constant.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="requester.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="requester.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="tcpcli01.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="tcpserv01.c" ex="false" tool="0" flavor2="0">
