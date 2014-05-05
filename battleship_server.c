@@ -1,5 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "unp.h"
 #include "constant.h"
+#include "game.c"
+#include "struct.h"
 
 void process_message(int sockfd, char *buf, int length);
 void process_login(int sockfd, char *username);
