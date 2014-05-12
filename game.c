@@ -23,7 +23,7 @@ int check_2(char board[nrows][ncols],int x, int y); // checks grid that player s
 void beta_hit(char board[nrows][ncols], int x ,int y, int z); // prints respective x or o on screen
 
 /* Battleship */
-int main(void)
+int main(int argc, char ** argv)
 {
 srand(time(NULL)); // randomizing function
 int game; // game loop
@@ -46,11 +46,11 @@ c = 0;
 error = 0;
 welcome();//instructions provided if necessary
 win = 0;// initial win value
-system("PAUSE");
+//system("PAUSE");
 game = 1; // initializes game and loop
 initial_grid(grid);// places grid in memory
 initial_grid(grid_2);// places grid in memory
-system("CLS");// clears screen
+//system("CLS");// clears screen
 Computer_placement( grid, "destroyer" , 4); // char in the middle provide
 Computer_placement( grid, "cruiser" , 3);
 Computer_placement( grid, "vessel" , 2);
@@ -87,58 +87,55 @@ Computer_placement( grid_2, "~XO" , 2);
 
 do{       // ships are placed
 
-DisplayGrid(grid_2);// "empty grid" is shown
-printf(" BEEP!  Enemies detected.... Fire at will!\n\n");
-printf(" Please enter the coordinates of the strike sir! \n\n"); // coordinates inputed by user
-printf(" Take Control of the artillery...\n\n\n");
-printf(" - enter a number then 'enter' key...\n\n\n");
-printf("(row): ");
-scanf("%d", &row);
-printf("(column): ");
-scanf("%d", &col);
- if( row > 9 || row<0 ||  col > 9 ||  col <0){
- printf("invalid entry... re-enter coordinates\n");
- system("PAUSE");
-continue;
-}
-if(grid[row][col] == 'X' || grid[row][col] == 'O')
-{
+    DisplayGrid(grid_2);// "empty grid" is shown
+    printf(" BEEP!  Enemies detected.... Fire at will!\n\n");
+    printf(" Please enter the coordinates of the strike sir! \n\n"); // coordinates inputed by user
+    printf(" Take Control of the artillery...\n\n\n");
+    printf(" - enter a number then 'enter' key...\n\n\n");
+    printf("(row): ");
+    scanf("%d", &row);
+    printf("(column): ");
+    scanf("%d", &col);
+    if( row > 9 || row<0 ||  col > 9 ||  col <0){
+        printf("invalid entry... re-enter coordinates\n");
+ //system("PAUSE");
+        continue;
+    }
+    if(grid[row][col] == 'X' || grid[row][col] == 'O')
+    {
+        continue;
+    }
 
- continue;               
-}
+    fire(grid,row,col);// re-enters coordinate as either hit or miss
 
-fire(grid,row,col);// re-enters coordinate as either hit or miss
+//check_2(grid,row, col);// returns integer value for hit or miss calculations and printing 'x' or 'o'
+    trans = check_2(grid,row, col); // trans value is input to next function to tell an 'x' or 'o'
 
-check_2(grid,row, col);// returns integer value for hit or miss calculations and printing 'x' or 'o'
-trans = check_2(grid,row, col); // trans value is input to next function to tell an 'x' or 'o'
+    if(trans == 1){ // TRANSintion code to transer coordinate information to player graph.
+        win++;   // if X is printed (hit), then win increments until nine coodinates are hit
+    }
+    beta_hit(grid_2,row,col,trans);// prints x or o to grid 2 ( user)
+    DisplayGrid(grid_2);// displays "current" grid postioning
+    check_hit(grid,row,col); // prints hit or miss
+//system("pause");
+    counter++;// counts moves made
 
-if(trans == 1){ // TRANSintion code to transer coordinate information to player graph.
-win++;   // if X is printed (hit), then win increments until nine coodinates are hit
-}
-beta_hit(grid_2,row,col,trans);// prints x or o to grid 2 ( user)
-DisplayGrid(grid_2);// displays "current" grid postioning
-check_hit(grid,row,col); // prints hit or miss   
-system("pause");                                
-counter++;// counts moves made
+    if(win == iWIN){
+        game = 0;  // end_game
+    }
 
-if(win == iWIN){
-game = 0;  // end_game
-}
+    }while(game == 1 && win <= iWIN);
+    if(game == 0){
+//system("CLS");
+        printf("You win!\n");
+    }
+    if( game == 2){
+    //system("PAUSE");
+        return 0;
+    }
 
-}while(game == 1 && win <= iWIN); 
-if(game == 0){
-system("CLS");
-printf("You win!\n");
-printf("Captain... you saved us!!!\n\n");
-printf("You completed the game in %d move(s)!\n\n",counter);   // } statistics once game ended
-}
-if( game == 2){
-    system("PAUSE");
+//system("PAUSE");
     return 0;
-}
-
-system("PAUSE");
-return 0;
 
 }/*  ------ End of Battleship --------- */
 
@@ -161,6 +158,10 @@ void welcome() // welcome function
 
 } // end function
 
+/**
+ * Init board grid
+ */
+
 void initial_grid(char board[nrows][ncols]) //Sets the board initially to all open spaces before ships inhabit water.
 {
     int i,j;
@@ -173,10 +174,14 @@ void initial_grid(char board[nrows][ncols]) //Sets the board initially to all op
 	}
 } // end function
 
+/**
+ * Display board grid
+ */
+
 void DisplayGrid(char board[nrows][ncols]) //Displays the entire 10x10 board.
 {
     int i,j;
-	system("CLS");
+	//system("CLS");
 	printf("  0 1 2 3 4 5 6 7 8 9\n\n");      // printing algorithm
 	for(i=0;i<10;i++)
 	{
@@ -386,62 +391,60 @@ void Computer_placement(char board[nrows][ncols], char ship[50], int size) // lo
 
 void fire(char board[nrows][ncols], int x,int y){ // fire function allow users to input coordinate of attack
 
- char hit_miss[10];
- int status;
- status = 1;
+    char hit_miss[10];
+    int status;
+    status = 1;
  
- do{
+    do{
         
- while( x > 9 || x<0 ||  y > 9 || y<0){
- printf("invalid entry... re-enter coordinates\n");   // avoids invalid entry after same coordinates are entered
- printf("(row)y: ");
-scanf("%d", &x);
-printf("(column)x: ");
-scanf("%d", &y);
-continue;
-}
+        while( x > 9 || x<0 ||  y > 9 || y<0){
+            printf("invalid entry... re-enter coordinates\n");   // avoids invalid entry after same coordinates are entered
+            printf("(row)y: ");
+            scanf("%d", &x);
+            printf("(column)x: ");
+            scanf("%d", &y);
+        }
 
-if(board[x][y]  == 'O' || board[x][y]  == 'X'){
-
- status = 1;
-
-  
-}
-if(board[x][y] == 'c' || board[x][y]== 'v' || board[x][y]== 'd'){
-hit_miss[0] = 'X';
-status = 0;
-}
-else {                    // prints respective x or o on background grid (grid 1)
-hit_miss[0] = 'O';
-status = 0;
-}
-}while(status==1); 
- board[x][y]= hit_miss[0];  
+        if(board[x][y]  == 'O' || board[x][y]  == 'X'){
+            status = 1;
+        }
+        if(board[x][y] == 'c' || board[x][y]== 'v' || board[x][y]== 'd'){
+            hit_miss[0] = 'X';
+            status = 0;
+        }
+        else {                    // prints respective x or o on background grid (grid 1)
+            hit_miss[0] = 'O';
+            status = 0;
+        }
+        
+    } while(status==1);
+    
+    board[x][y]= hit_miss[0];
 }  
 
-int check_2(char board[nrows][ncols],int x, int y){ // fire function allow users to input coordinate of attack for seconde grid
-if(board[x][y]=='X'){
-return 1;
-}
-else
-return 0;  
+int check_2(char board[nrows][ncols],int x, int y){ // fire function allow users to input coordinate of attack for second grid
+    if(board[x][y]=='X'){
+        return 1;
+    }
+    else
+        return 0;
 }
 
 void beta_hit(char board[nrows][ncols], int x,int y, int z){ // prints respective x or o on screen
 
-     if( z == 1 ){
-         board[x][y] = 'X';
-         } else
-         board[x][y] = 'O';
-     }
+    if( z == 1 ){
+        board[x][y] = 'X';
+    } else
+        board[x][y] = 'O';
+}
 
 
 void check_hit(char board[nrows][ncols],int x, int y){ // fire function allow users to input coordinate of attack
-if(board[x][y]=='X'){
-printf("HIT!\n\n");
-}
-else
-printf("MISS!\n\n");   
+    if(board[x][y]=='X'){
+        printf("HIT!\n\n");
+    }
+    else
+        printf("MISS!\n\n");
 }
    
    

@@ -1,4 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "unp.h"
+#include "game.c"
 
 void onload();
 int login_menu();
@@ -57,7 +61,7 @@ void onload() {
 int login_menu() {
 	char choice[10];
 	
-	printf("********** BATTLE SHIP **********\n");
+	printf("********** BATTLE SHIP GAME **********\n");
 	printf("\n");
 	printf(" 1. Login \n");
 	printf(" 2. Exit \n");
@@ -82,4 +86,53 @@ int login_menu() {
 	
 	return 0;
 }
+
+int main_menu() {
+    int choice = 0;
+    
+    printf(" ----------------------------------------------------- \n\n");
+    printf("       *****    Welcome to Battleship    ********       \n\n");
+    printf(" ----------------------------------------------------- \n\n\n\n");
+    
+    printf("1. Choose player to play\n");
+    printf("2. View ranking board\n");
+    printf("3. Log out and exit\n");
+    
+    while (!(choice < 4 && choice > 0)) {
+        printf("\tYour choice: "); scanf("%d", &choice);
+        
+        if (!(choice < 4 && choice > 0)) {
+            printf("Invalid choice!!\n");
+        }
+        else
+            return choice;
+    }
+    
+    return 0;
+}
+
+int main_play_menu() {
+    int choice = 0;
+    
+    printf(" ----------------------------------------------------- \n\n");
+    printf("       *****    Invite or wait for invitation    ********      \n\n");
+    printf(" ----------------------------------------------------- \n\n\n\n");
+    
+    printf("1. Send invitation\n");
+    printf("2. Wait for invitation\n");
+    printf("3. Exit to main menu\n");
+    
+    while (!(choice < 4 && choice > 0)) {
+        printf("\tYour choice: "); scanf("%d", &choice);
+        
+        if (!(choice < 4 && choice > 0)) {
+            printf("Invalid choice!!\n");
+        }
+        else
+            return choice;
+    }
+    
+    return 0;
+}
+
 
