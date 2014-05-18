@@ -1,6 +1,8 @@
 #ifndef CONSTANT_H
 #define	CONSTANT_H
 
+#define PORT 2020
+
 #define DEBUG 1
 #define MAX_TOKEN_NUM 10
 #define MAX_PLAYER_POOL 260

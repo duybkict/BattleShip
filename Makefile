@@ -1,18 +1,18 @@
-include Make.defines
-
-PROGS =	requester battleship_server battleship_client
-CUSTOMLIBS = requester.o
+PROGS =	battleship_server battleship_client struct
+#CUSTOMLIBS = struct.o
+CC = gcc
+CFLAGS = -g
 
 all:	${PROGS}
-	
-requester:	requester.o
-		${CC} ${CFLAGS} -c requester.c ${LIBS}
+
+struct:	struct.o
+		${CC} ${CFLAGS} -c struct.c
 	
 battleship_server:	battleship_server.o
-		${CC} ${CFLAGS} -o $@ battleship_server.o ${LIBS}
+		${CC} ${CFLAGS} -o $@ battleship_server.c ${CUSTOMLIBS}
 	
 battleship_client:	battleship_client.o
-		${CC} ${CFLAGS} -o $@ battleship_client.o ${CUSTOMLIBS} ${LIBS}
+		${CC} ${CFLAGS} -o $@ battleship_client.o ${CUSTOMLIBS}
 
 clean:
-		rm -f ${PROGS} ${CLEANFILES}
+		rm -f ${PROGS} *.o
