@@ -41,13 +41,28 @@ void load_account(char* list[])
     fclose(file);
 }
 
-int check(char * account,char* list[])
+char* get_username(char * username)
+{
+    char * temp = (char *)malloc(sizeof(char) * 20);
+    strcpy(temp, username);
+    
+    int k = 0;
+    for (k = 0; k < strlen(username); k++)
+        if (temp[k] == ':') {
+            temp[k] = '\0';
+            break;
+        }
+    
+    return temp;
+}
+
+int check(char * input,char * list[])
 {
     int i = 0;
     
     while ((list[i] != NULL) && (strcmp(list[i],"") != 0)) {
-        if (strcmp(account, list[i]) == 0) {
-            printf ("- Account %s found!\n", account);
+        if (strcmp(get_username(input), get_username(list[i])) == 0) {
+            printf ("- Account %s found!\n", input);
             return 1;
         }
         i++;
@@ -67,7 +82,7 @@ int main(int argc, char *argv[])
     Player * plist = (Player *)malloc(sizeof(Player) * 100);
 
     Match * glist = (Match *)malloc(sizeof(Match) * 10);
-    char username[50], passwd[50], buff[500];
+    char username[50], buff[500];
     char address[100];
     int soc1 = 0,soc2 = 0;
     long bytes_recieved = 0;
@@ -88,7 +103,7 @@ int main(int argc, char *argv[])
     /* newly accept()ed socket descriptor */
     int newfd;
     int nbytes;
-    /* for setsockopt() SO_REUSEADDR, below */
+
     int yes = 1;
     unsigned int addrlen;
     int i, j;
@@ -197,6 +212,13 @@ int main(int argc, char *argv[])
                                     remove_player(plist, p1);
                             printf ("\t- Remove player success!\n");
                             
+                            soc2 = find_other_player_socket(glist, i);
+                            
+                            if (soc2 != -1) {
+                                send(soc2, "disconnect", 10, 0);
+                                update_player_status(plist, 0, soc2);
+                                printf("\t- Inform client %d\n", soc2);
+                            }
                             g1 = find_match_by_socket(glist,i);
                             if (strcmp(g1.log,"NA") != 0)
                                 remove_match(glist, g1);
@@ -220,155 +242,158 @@ int main(int argc, char *argv[])
                             bytes_recieved = recv(i,recv_data,1024,0);
                             recv_data[bytes_recieved] = '\0';
                             printf("\tUser: %s\n", recv_data);
-                            strcpy(username, recv_data);
-                            strcpy(passwd, recv_data);
                             
-                            if (check(username,list))
+                            if (check(recv_data,list))
                             {
-                                send(i,"ok",2,0);
+                                int k = 0;
+                                for (k = 0; k < strlen(recv_data); k++)
+                                    if (recv_data[k] == ':')
+                                        break;
+                                strncpy(username, recv_data, k);
+                                username[k] = '\0';
                                 
-                                printf("Current player list:\n");
-                                j=0;
-                                while(1)
-                                {
-                                    if (strcmp(plist[j].name,"")==0) break;
+                                if (find_sock_by_player_name(plist, username) != -1)
+                                    printf("User is already online!!\n");
+                                else {
+                                    send(i,"ok",2,0);
                                     
-                                    printf ("(%d) %s\n", j, plist[j].name);
-                                    j++;
+                                    printf("Current player list:\n");
+                                    j = 0;
+                                    while(1)
+                                    {
+                                        if (strcmp(plist[j].name,"")==0) {
+                                            printf("\tNo one!\n");
+                                            break;
+                                        }
+                                        printf ("\t(%d) %s\n", j, plist[j].name);
+                                        j++;
+                                    }
+                                    
+                                    bytes_recieved=recv(i,recv_data,1024,0);
+                                    recv_data[bytes_recieved] = '\0';
+                                    if (strcmp(recv_data,"loginok")==0)
+                                        send (i,plist,sizeof(Player)*100,0);
+                                    
+                                    p1 = new_player(i, 0, 0, 0, username, address);
+                                    add_player(plist,p1);
                                 }
-                                bytes_recieved=recv(i,recv_data,1024,0);
-                                recv_data[bytes_recieved] = '\0';
-                                if (strcmp(recv_data,"loginok")==0)
-                                    send (i,plist,sizeof(Player)*100,0);
-                                
-                                p1 = new_player(i, 0, 0, 1, username, address);
-                                add_player(plist,p1);
                             }
                             else
                             {
                                 send(i,"not",3,0);
                             }
                         }
-                        /*else if (strcmp(recv_data, "register")==0) // REGISTER
+                        else if (strcmp(recv_data, "register") == 0)
                         {
-                            printf("register process\n");
-                            send(i,"continue",8,0);
+                            printf("* REGISTER * Register process\n");
+
                             bytes_recieved=recv(i,recv_data,1024,0);
                             recv_data[bytes_recieved] = '\0';
+                            
                             if(check(recv_data,list))
                             {
-                                send(i,"not",3,0);
+                                send(i, "error", 5, 0);
                             }
                             else
                             {
-                                f=fopen("acclist.txt","a");
-                                if(f==NULL){
+                                file = fopen("account.txt","a");
+                                if(file == NULL){
                                     printf ("error open list acc file to write\n");
                                     exit(1);
                                 }
                                 
-                                fputs(recv_data,f);
-                                fclose(f);
-                                send(i,"ok",2,0);
+                                strcat(recv_data, "\n");
+                                fputs(recv_data,file);
+                                fclose(file);
+                                
+                                p1 = new_player(i, 0, 0, 0, get_username(recv_data), address);
+                                add_player(plist,p1);
+                                
+                                send(i, "success", 7, 0);
                             }
-                        }*/
+                        }
                         
-                        else if(strcmp(recv_data, "invite") == 0) {
+                        else if (strcmp(recv_data, "invite") == 0) {
                             printf("*INVITE* Invite process\n");
                             bytes_recieved = recv(i,recv_data,1024,0);
                             recv_data[bytes_recieved] = '\0';
                             strcpy(user_invite,recv_data);
                             soc2 = find_sock_by_player_name(plist,user_invite);
                             
-                            soc1 = i;
-                            
-                            p1 = find_player_by_socket(plist,soc1);
-                            p2 = find_player_by_socket(plist,soc2);
-                            
-                            g1 = new_match(p1,p2);
-                            add_match(glist,g1);
-                            
-                            file = fopen(g1.log,"w");
-                            if (file == NULL) {
-                                printf ("1 error open log file to write\n");
-                                exit(1);
+                            if (soc2 == -1)
+                                send(i, "notfound", 8, 0);
+                            else {
+                                soc1 = i;
+                                
+                                p1 = find_player_by_socket(plist,soc1);
+                                p2 = find_player_by_socket(plist,soc2);
+                                
+                                g1 = new_match(p1,p2);
+                                add_match(glist,g1);
+                                
+                                file = fopen(g1.log,"w");
+                                if (file == NULL) {
+                                    printf ("1 error open log file to write\n");
+                                    exit(1);
+                                }
+                                
+                                strcpy(buff,"");
+                                lt = time(NULL);
+                                strcat(buff,ctime(&lt));
+                                strcat(buff,p1.name);
+                                strcat(buff," play with ");
+                                strcat(buff,p2.name);
+                                strcat(buff,"\n");
+                                
+                                fputs(buff, file);
+                                fclose(file);
+                                printf("-+ found sock = %d\n", soc2);
+                                
+                                strcpy(buff, "User ");
+                                strcat(buff, p1.name);
+                                strcat(buff, " want to challenge you!");
+                                
+                                send(soc2, buff, strlen(buff), 0);
                             }
-                            
-                            strcpy(buff,"");
-                            lt = time(NULL);
-                            strcat(buff,ctime(&lt));
-                            strcat(buff,p1.name);
-                            strcat(buff," play with ");
-                            strcat(buff,p2.name);
-                            strcat(buff,"\n");
-                            
-                            fputs(buff, file);
-                            fclose(file);
-                            printf("-+ found sock = %d\n", soc2);
-                            send(soc2,"invitation",10,0);
                         }
-                        
-                        else if (strcmp(recv_data, "y")==0)
+                        else if (strcmp(recv_data, "viewlist") == 0)
                         {
-                            printf("connect %d with %d\n", soc1, soc2);
+                            send (i,plist,sizeof(Player)*100,0);
+                        }
+                        else if (strcmp(recv_data, "onwait") == 0)
+                        {
+                            update_player_status(plist, 1, i);
+                        }
+                        else if (strcmp(recv_data, "y") == 0)
+                        {
+                            printf("*ACCEPT* connect %d with %d\n", soc1, soc2);
                             send(soc1,"accept",6,0);
+                            update_player_status(plist, 2, soc1);
+                            update_player_status(plist, 2, soc2);
                         }
-                        else if (strcmp(recv_data, "n")==0)
+                        else if (strcmp(recv_data, "n") == 0)
                         {
-                            printf ("not accept connect!!\n");
+                            printf ("*REFUSE* %d not accept connect to %d!!\n", soc2, soc1);
                             send(soc1,"refuse",6,0);
                             g1 = find_match_by_socket(glist,soc1);
                             if (strcmp(g1.log, "NA") != 0) {
                                 remove_match(glist,g1);
                             }
                         }
-                        else if(strcmp(recv_data, "win")==0)
+                        else if(strcmp(recv_data, "lose")==0)
                         {
-                            send(i,"continue",8,0);
-                            bytes_recieved=recv(i,recv_data,1024,0);
-                            recv_data[bytes_recieved] = '\0';
-                            send(find_player_socket(glist,i), recv_data, strlen(recv_data), 0);
-                            
-                            p1 = find_player_by_socket(plist,i);
-                            g1 = find_match_by_socket(glist,i);
-                            
-                            file = fopen(g1.log ,"a");
-                            if(file == NULL) {
-                                printf ("Error(2) open log file to write!\n");
-                                exit(1);
-                            }
-                            
-                            strcpy(buff,p1.name);
-                            strcat(buff," : ");
-                            strcat(buff,recv_data);
-                            strcat(buff,"\n");
-                            fputs(buff, file);
-                            
-                            fclose(file);
-                            
-                            soc1 = i;
-                            soc2 = find_player_socket(glist,i);
-                            
-                            g1 = find_match_by_socket(glist,i);
-                            if (strcmp(g1.log,"")!=0) {
-                                file = fopen(g1.log,"r");
-                                while(!feof(file)){
-                                    fgets(recv_data,200,file);
-                                    puts(recv_data);
-                                    send(soc1,recv_data,strlen(recv_data),0);
-                                    send(soc2,recv_data,strlen(recv_data),0);
-                                }
-                                
-                                send(soc1,"ENDFILE",7,0);
-                                send(soc2,"ENDFILE",7,0);
-                                
-                                fclose(file);
-                            }
+                            soc2 = find_other_player_socket(glist, i);
+                            send(soc2, "win", 3, 0);
+                            printf("* MATCH OVER * Client %d won over client %d\n", soc2, i);
+                            update_player_status(plist, 0, soc2);
+                            update_player_status(plist, 0, i);
+                            update_player_win(plist, soc2);
+                            update_player_lose(plist, i);
                         }
                         else
                         {
-                            printf("recv_data = %s\n",recv_data);
-                            send(find_player_socket(glist,i),recv_data,strlen(recv_data),0);
+                            printf("*PLAY* recv_data = %s from client %d\n",recv_data, i);
+                            send(find_other_player_socket(glist,i),recv_data,strlen(recv_data),0);
                             p1 = find_player_by_socket(plist,i);
                             g1 = find_match_by_socket(glist,i);
                             file = fopen(g1.log,"a");

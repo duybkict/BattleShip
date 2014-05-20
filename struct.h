@@ -21,25 +21,19 @@ typedef struct Match_ {
     char mapTwo[ROW][COLUMN];
 } Match;
 
-typedef struct Turn_ {
-    int row;
-    int column;
-} Turn;
-
-
 Player new_player(int fd, int win, int lose, int status, char * name, char * ip);
 void add_player(Player * list, Player player);
 void remove_player(Player * list, Player player);
 
-
-int find_player_socket(Match * list,int socket);
+int find_other_player_socket(Match * list,int socket);
 int find_sock_by_player_name(Player * list,char * name);
-
+void update_player_status(Player * list, int status, int socket);
+void update_player_win(Player * list, int socket);
+void update_player_lose(Player * list, int socket);
 
 Match new_match(Player p1,Player p2);
 void add_match(Match * list,Match match);
 void remove_match(Match * list, Match match);
-
 
 Player find_player_by_socket(Player * list,int socket);
 Match find_match_by_socket(Match * list,int socket);

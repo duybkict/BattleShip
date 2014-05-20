@@ -81,6 +81,57 @@ int find_sock_by_player_name(Player * list,char * name)
     }
 }
 
+void update_player_status(Player * list, int status, int socket)
+{
+    printf("+++ update player status\n");
+    int i = 0;
+    
+    while(1)
+    {
+        if (list[i].fd == socket) {
+            list[i].status = status;
+            break;
+        }
+        i++;
+        if (strcmp(list[i].name,"") == 0)
+            return;
+    }
+}
+
+void update_player_win(Player * list, int socket)
+{
+    printf("+++ update player status\n");
+    int i = 0;
+    
+    while(1)
+    {
+        if (list[i].fd == socket) {
+            list[i].win++;
+            break;
+        }
+        i++;
+        if (strcmp(list[i].name,"") == 0)
+            return;
+    }
+}
+
+void update_player_lose(Player * list, int socket)
+{
+    printf("+++ update player status\n");
+    int i = 0;
+    
+    while(1)
+    {
+        if (list[i].fd == socket) {
+            list[i].lose++;
+            break;
+        }
+        i++;
+        if (strcmp(list[i].name,"") == 0)
+            return;
+    }
+}
+
 Match new_match(Player p1,Player p2)
 {
     printf("+++ new match\n");
@@ -156,7 +207,7 @@ Match find_match_by_socket(Match * list,int socket)
     return match;
 }
 
-int find_player_socket(Match * list,int socket)
+int find_other_player_socket(Match * list,int socket)
 {
     printf("+++ find player socket: %d\n", socket);
     int i=0;
