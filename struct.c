@@ -147,12 +147,6 @@ Match new_match(Player p1,Player p2)
     strcat(log,".txt");
     strcpy(match.log,log);
 
-    for (i = 0; i < ROW; i++)
-        for (j = 0; j < COLUMN; j++) {
-            match.mapOne[i][j] = '-';
-            match.mapTwo[i][j] = '-';
-        }
-
     return match;
 }
 

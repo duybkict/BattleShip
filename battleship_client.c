@@ -235,6 +235,11 @@ int main_play_menu() {
 
 int main(int args, char * argv[])
 {
+    if (argv[1] == NULL) {
+        printf("Usage: ./battleship_client ip\n");
+        exit(1);
+    }
+    
     int i=0;
     
     Player * plist = (Player *)malloc(sizeof(Player) * 100);
@@ -250,7 +255,7 @@ int main(int args, char * argv[])
     struct sockaddr_in server_addr;
     int mn, mn2;
 
-    host = gethostbyname("127.0.0.1");
+    host = gethostbyname(argv[1]);
     
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         perror("Socket");
@@ -331,6 +336,10 @@ int main(int args, char * argv[])
                             else if (strcmp(recv_data, "notfound") == 0)
                             {
                                 printf("No user found!!\n");
+                            }
+                            else if (strcmp(recv_data, "notavailable") == 0)
+                            {
+                                printf("User [%s] is not available right now!\n", invite);
                             }
                             break;
                         case 2://mn2

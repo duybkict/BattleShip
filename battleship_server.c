@@ -328,32 +328,38 @@ int main(int argc, char *argv[])
                                 p1 = find_player_by_socket(plist,soc1);
                                 p2 = find_player_by_socket(plist,soc2);
                                 
-                                g1 = new_match(p1,p2);
-                                add_match(glist,g1);
-                                
-                                file = fopen(g1.log,"w");
-                                if (file == NULL) {
-                                    printf ("1 error open log file to write\n");
-                                    exit(1);
+                                if (p2.status != 1) {
+                                    printf("Client %d not available at the moment\n", soc2);
+                                    send(i, "notavailable", 12, 0);
                                 }
-                                
-                                strcpy(buff,"");
-                                lt = time(NULL);
-                                strcat(buff,ctime(&lt));
-                                strcat(buff,p1.name);
-                                strcat(buff," play with ");
-                                strcat(buff,p2.name);
-                                strcat(buff,"\n");
-                                
-                                fputs(buff, file);
-                                fclose(file);
-                                printf("-+ found sock = %d\n", soc2);
-                                
-                                strcpy(buff, "User ");
-                                strcat(buff, p1.name);
-                                strcat(buff, " want to challenge you!");
-                                
-                                send(soc2, buff, strlen(buff), 0);
+                                else {
+                                    g1 = new_match(p1,p2);
+                                    add_match(glist,g1);
+                                    
+                                    file = fopen(g1.log,"w");
+                                    if (file == NULL) {
+                                        printf ("1 error open log file to write\n");
+                                        exit(1);
+                                    }
+                                    
+                                    strcpy(buff,"");
+                                    lt = time(NULL);
+                                    strcat(buff,ctime(&lt));
+                                    strcat(buff,p1.name);
+                                    strcat(buff," play with ");
+                                    strcat(buff,p2.name);
+                                    strcat(buff,"\n");
+                                    
+                                    fputs(buff, file);
+                                    fclose(file);
+                                    printf("-+ found sock = %d\n", soc2);
+                                    
+                                    strcpy(buff, "User [");
+                                    strcat(buff, p1.name);
+                                    strcat(buff, "] want to challenge you!");
+                                    
+                                    send(soc2, buff, strlen(buff), 0);
+                                }
                             }
                         }
                         else if (strcmp(recv_data, "viewlist") == 0)

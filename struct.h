@@ -17,8 +17,6 @@ typedef struct Match_ {
     char log[100];
     Player playerOne;
     Player playerTwo;
-    char mapOne[ROW][COLUMN];
-    char mapTwo[ROW][COLUMN];
 } Match;
 
 Player new_player(int fd, int win, int lose, int status, char * name, char * ip);
